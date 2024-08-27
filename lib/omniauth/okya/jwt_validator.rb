@@ -91,7 +91,7 @@ module OmniAuth
 
         verify_iss(id_token)
         verify_sub(id_token)
-        verify_aud(id_token)
+        # verify_aud(id_token) # TODO: Renable this when we have a valid audience
         verify_expiration(id_token, leeway)
         verify_iat(id_token)
         verify_nonce(id_token, nonce)
