@@ -19,7 +19,7 @@ module OmniAuth
 
         @client_id = options.client_id
         @client_secret = options.client_secret
-        @audience = options.audiences << @client_id
+        @audiences = options.audiences << @client_id
       end
 
       # Decodes a JWT and verifies it's signature. Only tokens signed with the RS256 or HS256 signatures are supported.
@@ -92,7 +92,7 @@ module OmniAuth
 
         verify_iss(id_token)
         verify_sub(id_token)
-        # verify_aud(id_token)
+        verify_aud(id_token)
         verify_expiration(id_token, leeway)
         verify_iat(id_token)
         verify_nonce(id_token, nonce)
