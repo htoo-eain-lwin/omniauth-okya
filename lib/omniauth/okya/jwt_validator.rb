@@ -19,7 +19,7 @@ module OmniAuth
 
         @client_id = options.client_id
         @client_secret = options.client_secret
-        @audiences = options.audiences << @client_id
+        @audience = options.audience
       end
 
       # Decodes a JWT and verifies it's signature. Only tokens signed with the RS256 or HS256 signatures are supported.
@@ -125,7 +125,7 @@ module OmniAuth
                 'Audience (aud) claim must be a string or array of strings present in the ID token'
         end
 
-        allowed_audiences = [@client_id, *@audiences].uniq
+        allowed_audiences = [@client_id, *@audience].uniq
 
         if audience.is_a?(Array)
           # Check if any of the token's audiences matches an allowed audience
