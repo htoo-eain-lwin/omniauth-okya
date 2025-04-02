@@ -129,13 +129,13 @@ module OmniAuth
 
         if audience.is_a?(Array)
           # Check if any of the token's audiences matches an allowed audience
-          unless (audience - allowed_audiences).empty?
+          if (audience - allowed_audiences).present?
             raise OmniAuth::Okya::TokenValidationError,
                   "Audience (aud) claim mismatch in the ID token; expected values of #{allowed_audiences.join(', ')} but got #{audience.join(', ')}"
           end
 
         # Case 2: Token's audience is a string (e.g., "api1")
-        elsif !allowed_audiences.include?(audience)
+        elsif allowed_audiences.exclude?(audience)
           raise OmniAuth::Okya::TokenValidationError,
                 "Audience (aud) claim mismatch in the ID token; expected one of #{allowed_audiences.join(', ')} but got #{audience}"
         end
