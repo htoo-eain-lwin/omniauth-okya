@@ -19,6 +19,7 @@ module OmniAuth
 
         @client_id = options.client_id
         @client_secret = options.client_secret
+        @audience = options.audience
       end
 
       # Decodes a JWT and verifies it's signature. Only tokens signed with the RS256 or HS256 signatures are supported.
@@ -122,12 +123,21 @@ module OmniAuth
         if !audience || !(audience.is_a?(String) || audience.is_a?(Array))
           raise OmniAuth::Okya::TokenValidationError,
                 'Audience (aud) claim must be a string or array of strings present in the ID token'
-        elsif audience.is_a?(Array) && !audience.include?(@client_id)
+        end
+
+        allowed_audiences = [@client_id, *@audience].uniq
+
+        if audience.is_a?(Array)
+          # Check if any of the token's audiences matches an allowed audience
+          if (audience - allowed_audiences).present?
+            raise OmniAuth::Okya::TokenValidationError,
+                  "Audience (aud) claim mismatch in the ID token; expected values of #{allowed_audiences.join(', ')} but got #{audience.join(', ')}"
+          end
+
+        # Case 2: Token's audience is a string (e.g., "api1")
+        elsif allowed_audiences.exclude?(audience)
           raise OmniAuth::Okya::TokenValidationError,
-                "Audience (aud) claim mismatch in the ID token; expected #{@client_id} but was not one of #{audience.join(', ')}"
-        elsif audience.is_a?(String) && audience != @client_id
-          raise OmniAuth::Okya::TokenValidationError,
-                "Audience (aud) claim mismatch in the ID token; expected #{@client_id} but found #{audience}"
+                "Audience (aud) claim mismatch in the ID token; expected one of #{allowed_audiences.join(', ')} but got #{audience}"
         end
       end
 
